@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocolo IM2-100 - Konecta</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        :root {
+            --konecta-verde: #063D3B; /* Verde Esmeralda Base */
+            --konecta-dorado: #D4AF37; /* Dorado para resaltar */
+            --konecta-dorado-oscuro: #AA7C11;
+            --konecta-negro: #111111; /* Negro para profundizar */
+            --konecta-gris-claro: #F9F9F9;
+            --destello: #FFFFFF; /* Fondo Blanco Obligatorio */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--destello);
+            color: var(--konecta-negro);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--destello);
+            padding: 50px;
+            border-radius: 4px;
+            box-shadow: 0 4px 25px rgba(17, 17, 17, 0.06);
+            border-top: 6px solid var(--konecta-verde);
+            border-bottom: 2px solid var(--konecta-dorado);
+            text-align: center;
+            position: relative;
+        }
+
+        h1.main-title {
+            font-family: 'Cinzel', 'Times New Roman', Georgia, serif;
+            font-size: 32px;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--konecta-dorado) 0%, var(--konecta-dorado-oscuro) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--konecta-negro);
+            margin: 0 0 35px 0;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .instructions-box {
+            background-color: var(--konecta-gris-claro);
+            padding: 25px;
+            border-left: 4px solid var(--konecta-dorado);
+            border-radius: 4px;
+            text-align: justify;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 35px;
+            color: var(--konecta-negro);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            color: var(--konecta-verde);
+            letter-spacing: 1px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            box-sizing: border-box;
+            border: 1px solid #DDDDDD;
+            border-radius: 4px;
+            font-size: 16px;
+            color: var(--konecta-negro);
+            background-color: var(--destello);
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--konecta-dorado);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: var(--konecta-gris-claro);
+            border-radius: 3px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--konecta-verde);
+            transition: width 0.3s ease;
+        }
+
+        #question-counter {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--konecta-dorado-oscuro);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #question-text {
+            font-size: 22px;
+            line-height: 1.6;
+            min-height: 120px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--konecta-negro);
+            font-weight: 500;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 16px 55px;
+            font-size: 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background-color: var(--konecta-verde);
+            color: var(--destello);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--konecta-negro);
+        }
+
+        .btn-secondary {
+            background-color: var(--konecta-dorado);
+            color: var(--destello);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--konecta-dorado-oscuro);
+        }
+
+        .btn-primary:disabled {
+            background-color: #CCCCCC;
+            cursor: not-allowed;
+        }
+
+        #quiz-section, #results-section {
+            display: none;
+        }
+
+        .result-display {
+            font-size: 17px;
+            color: var(--konecta-negro);
+            margin: 30px 0;
+            padding: 30px;
+            border-top: 4px solid var(--konecta-dorado);
+            background-color: var(--konecta-gris-claro);
+            border-radius: 4px;
+            text-align: justify;
+            line-height: 1.7;
+        }
+
+        .result-meta {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--konecta-verde);
+            margin-bottom: 20px;
+            font-weight: 700;
+            border-bottom: 1px dashed var(--konecta-dorado);
+            padding-bottom: 12px;
+        }
+
+        .footer-note {
+            margin-top: 60px;
+            font-size: 11px;
+            color: #777777;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-top: 1px solid #EEEEEE;
+            padding-top: 25px;
+            line-height: 1.5;
+        }
+
+        #status-message {
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 20px;
+            color: var(--konecta-verde);
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    
+    <div id="intro-section">
+        <h1 class="main-title">KONECTA</h1>
+        <div class="subtitle">Protocolo IM2-100: Evaluación de Equilibrio Gabaérgico</div>
+        
+        <div class="instructions-box">
+            <p><strong>INSTRUCCIONES:</strong></p>
+            <p>A continuación, se le presentará una serie de 100 afirmaciones. Lea cuidadosamente cada una y responda seleccionando <strong>"SÍ"</strong> o <strong>"NO"</strong>, basándose en cómo se ha sentido predominantemente durante los últimos 7 días.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="patient-name">Nombre Completo:</label>
+            <input type="text" id="patient-name" placeholder="Ej. Yannick Espejel">
+        </div>
+        <div class="form-group">
+            <label for="patient-age">Edad:</label>
+            <input type="number" id="patient-age" placeholder="Ej. 28">
+        </div>
+        
+        <button class="btn-primary" onclick="startQuiz()">Comenzar Evaluación</button>
+    </div>
+
+    <div id="quiz-section">
+        <h1 class="main-title">KONECTA</h1>
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+        
+        <div id="question-counter">Pregunta 1 de 100</div>
+        <div id="question-text">Cargando...</div>
+        
+        <div class="button-group">
+            <button class="btn-primary" onclick="handleAnswer(true)">Sí</button>
+            <button class="btn-secondary" onclick="handleAnswer(false)">No</button>
+        </div>
+    </div>
+
+    <div id="results-section">
+        <h1 class="main-title">Evaluación Completada</h1>
+        <div class="subtitle">Análisis Estructural</div>
+        
+        <div id="patient-summary" class="result-display">Procesando...</div>
+        
+        <button class="btn-primary" id="btn-submit" onclick="submitData()">Enviar Resultados</button>
+        <div id="status-message"></div>
+    </div>
+
+    <div class="footer-note">
+        Herramienta interna de Konecta creada por Yannick Espejel / El Neurocientífico de Konecta.
+    </div>
+
+</div>
+
+<script>
+    try {
+        emailjs.init("z7UKWFlgvcMOGPNBO");
+    } catch (error) {
+        console.warn("No se pudo iniciar EmailJS.");
+    }
+
+    const questions = [
+        "Mantengo la calma ante ruidos imprevistos.",
+        "Mi capacidad para iniciar el sueño ha mejorado.",
+        "Puedo estructurar mis ideas sin saltar de tema.",
+        "Siento mis movimientos fluidos y precisos.",
+        "Experimento tension constante en la mandibula.",
+        "Logro terminar mis tareas sin desesperacion.",
+        "Mi respiracion es profunda y regular.",
+        "Siento que mi mente procesa con claridad.",
+        "Disminucion en la rumiacion de pensamientos.",
+        "La interaccion social ya no me agota.",
+        "Siento impulsos de mover las piernas en reposo.",
+        "Mi estado de animo es constante.",
+        "Mantengo el enfoque por mas de 30 minutos.",
+        "La sensacion de bienestar es persistente.",
+        "Baja irritabilidad ante esperas.",
+        "Control sobre mis reacciones emocionales.",
+        "Me despierto con angustia sin motivo.",
+        "Descanso nocturno reparador.",
+        "Apetito estable sin atracones.",
+        "Resuelvo problemas sin entrar en panico.",
+        "Mi cuerpo se relaja con facilidad.",
+        "Memoria operativa funcional.",
+        "Sobresalto excesivo ante el contacto fisico.",
+        "Palpitaciones por estres desaparecidas.",
+        "Siento que el tiempo transcurre normal.",
+        "Escucho criticas sin defensividad.",
+        "Postura corporal relajada.",
+        "Baja pesadez mental vespertina.",
+        "Necesidad urgente de hablar constante.",
+        "Vision clara sin fatiga ocular.",
+        "Disfruto actividades silenciosas.",
+        "Coordinacion ojo-mano precisa.",
+        "Sistema digestivo regular.",
+        "Manos secas bajo presion.",
+        "Me cuesta mucho trabajo quedarme quieto en una silla.",
+        "Paciencia en labores cotidianas.",
+        "Demandas externas manejables.",
+        "Capacidad de analisis critico intacta.",
+        "Tolerancia a cambios de planes.",
+        "Puedo delegar sin ansiedad.",
+        "Pensamientos agolpados al hablar.",
+        "Energia equitativa durante el dia.",
+        "Capacidad para perdonar errores propios.",
+        "Conexion armoniosa mente-cuerpo.",
+        "Cefaleas por tension cesadas.",
+        "Espero turnos con tranquilidad.",
+        "Siento que el mundo va muy lento.",
+        "Interes genuino por proyectos nuevos.",
+        "Juicio no nublado por miedo.",
+        "Calidad de conversacion profunda.",
+        "Ignoro estimulos visuales distractores.",
+        "Respuesta al dolor menos reactiva.",
+        "Opresion en garganta ante retos.",
+        "Desaparicion de vacio en estomago.",
+        "Planifico a largo plazo con optimismo.",
+        "Escritura clara y pulso firme.",
+        "Entorno percibido como seguro.",
+        "Baja necesidad de estimulantes.",
+        "Sudoracion fria ante correcciones.",
+        "Reconozco emociones sin desborde.",
+        "Voz firme y pausada.",
+        "Organismo asimilo el estimulo.",
+        "Baja hipersensibilidad a olores.",
+        "Tareas minuciosas con paciencia.",
+        "Siento que debo estar alerta siempre.",
+        "Capacidad de asertividad mayor.",
+        "Ciclos biologicos sincronizados.",
+        "Mareo por estres desaparecido.",
+        "Leo señales no verbales con claridad.",
+        "Decisiones racionales, no por temor.",
+        "Me cuesta trabajo profundizar la respiracion.",
+        "Descanso de alta calidad.",
+        "Piel saludable y menos reactiva.",
+        "Sin agobio en lugares concurridos.",
+        "Tension lumbar disminuida.",
+        "Creatividad sin bloqueos.",
+        "Picazon en piel sin causa medica.",
+        "Mantengo mirada tranquila al hablar.",
+        "Capacidad de sintesis mejorada.",
+        "Equilibrio gabaergico notable.",
+        "Fatiga al despertar inexistente.",
+        "Organizo prioridades con logica.",
+        "Sensacion de olvido constante.",
+        "Gratitud por mi proceso.",
+        "Respuesta ante critica analitica.",
+        "Calma en habitacion a oscuras.",
+        "Coordinacion motriz eficiente.",
+        "Ruidos fuertes no me desequilibran.",
+        "Siento que mis extremidades pesan demasiado.",
+        "Sentido del humor ligero.",
+        "Comida sin distracciones digitales.",
+        "Sistema inmunologico fuerte.",
+        "Capacidad para decir no sin culpa.",
+        "Baja urgencia por el futuro.",
+        "Me muerdo las uñas o los labios con frecuencia.",
+        "Intelecto en punto optimo.",
+        "Silencio por periodos largos.",
+        "Postura al caminar erguida.",
+        "Tratamiento efectivo.",
+        "Estado de equilibrio integral."
+    ];
+
+    const inverseIndices = [5, 11, 17, 23, 29, 35, 41, 47, 53, 59, 65, 71, 77, 83, 89, 95];
+    let currentIndex = 0;
+    let score = 0;
+    let patientName = "";
+    let patientAge = "";
+
+    function startQuiz() {
+        patientName = document.getElementById('patient-name').value.trim();
+        patientAge = document.getElementById('patient-age').value.trim();
+
+        if (!patientName || !patientAge) {
+            alert("Por favor, ingrese su nombre y edad para comenzar.");
+            return;
+        }
+
+        document.getElementById('intro-section').style.display = 'none';
+        document.getElementById('quiz-section').style.display = 'block';
+        updateUI();
+    }
+
+    function updateUI() {
+        if (currentIndex < questions.length) {
+            document.getElementById('question-text').innerText = questions[currentIndex];
+            document.getElementById('question-counter').innerText = `Pregunta ${currentIndex + 1} de 100`;
+            document.getElementById('progress-bar').style.width = `${((currentIndex) / 100) * 100}%`;
+        } else {
+            finishQuiz();
+        }
+    }
+
+    function handleAnswer(answer) {
+        const isInverse = inverseIndices.includes(currentIndex + 1);
+        
+        if (answer === true) {
+            score += isInverse ? -1 : 1;
+        }
+        
+        currentIndex++;
+        updateUI();
+    }
+
+    function finishQuiz() {
+        document.getElementById('quiz-section').style.display = 'none';
+        document.getElementById('results-section').style.display = 'block';
+        
+        let metaText = "";
+        let bodyText = "";
+
+        if (score >= 70) {
+            metaText = `<strong>${patientName}</strong>, ${patientAge} años -- Score: ${score}<br><strong>Resultado Neuroquímico:</strong> GaBa Equilibrado - Oxitocina y Cortisol en homeostasis (Rango: 70 a 100 puntos)`;
+            bodyText = "Los resultados indican que su sistema nervioso ha alcanzado un estado de autorregulación óptimo. FELICIDADES, esto demuestra un gran compromiso contigo y con tu salud mental. Tu red neuronal, tu cerebro y como resultado tus conductas, metabolismo y socialización son óptimas, plenas y autónomas. Sigue así, sé el ejemplo vivo de la plenitud y correcta, sana y óptima salud física y mental. Los seguidores de Konecta son el aliciente para que el equipo esté en óptimas condiciones, así que te exhortamos a que sigas siendo parte de Konecta, ustedes son la gasolina que impulsa a nuestro equipo a mantenerse en óptimas condiciones. Continúa devorando tu proceso y liderando tu propia realidad.";
+        } else if (score >= 40) {
+            metaText = `<strong>${patientName}</strong>, ${patientAge} años -- Score: ${score}<br><strong>Resultado Neuroquímico:</strong> Inestabilidad Gabaérgica – Fluctuaciones de Cortisol y Dopamina reactiva (Rango: 40 a 69 puntos)`;
+            bodyText = "Los resultados indican que te encuentras en un estado de transición intermedia. Si bien tu sistema registra avances estructurales, persisten focos residuales de hiperexcitabilidad. En palabras claras: ante la menor crisis emocional, laboral o biológica, tu equilibrio se va a quebrar porque tu umbral de resistencia sigue siendo frágil. Estás a medio camino entre la funcionalidad y el colapso. Quedarte estancado aquí es mediocridad terapéutica. Formar parte de la comunidad de Konecta te obliga a no conformarte con procesos a medias. La autorregulación real no es negociable si de tu salud y bienestar hablamos. Es el momento exacto para ajustar el tratamiento, acelerar el análisis y asegurar que todo el esfuerzo, dolor, miedo y señalamiento de quienes no creían en todo lo que vales como ser humano y la importancia que hoy tienes para mí y para Konecta, se vea consolidado. Juntos podemos llegar a la cima, permíteme trabajar en ese último escalón. Contáctame.";
+        } else {
+            metaText = `<strong>${patientName}</strong>, ${patientAge} años -- Score: ${score}<br><strong>Resultado Neuroquímico:</strong> Déficit Inhibitorio Agudo – Incremento Crítico de Cortisol y Glutamato Excitatorio (Rango: Menos de 40 puntos)`;
+            bodyText = "Tus resultados muestran un desequilibrio neuroquímico y conductual persistente. Tu sistema nervioso central actualmente carece de los recursos biológicos y analíticos necesarios para compensar los estímulos del entorno; estás operando en un estado de alerta. Vivir así es una elección de desgaste innecesaria. En Konecta impulsamos transformaciones radicales y de élite. Este puntaje es un llamado de atención técnico y urgente: Recuerda que un libro, un podcast, un live, un consejo o un échale ganas es exactamente el equivalente a hacer nada por nosotros. No confundas el estar bien con el estar normal. Permíteme trabajar contigo. Juntos podemos llegar a la cima. Es momento de que tú seas tu prioridad. Ya te has esforzado mucho por el mundo. Permíteme esforzarme a mí por ti. Contáctame.";
+        }
+
+        document.getElementById('patient-summary').innerHTML = `<div class="result-meta">${metaText}</div><div>${bodyText}</div>`;
+    }
+
+    function getInterpretationText() {
+        if (score >= 70) {
+            return "NIVEL I: EQUILIBRIO GABAÉRGICO CONSOLIDADO.";
+        } else if (score >= 40) {
+            return "NIVEL II: ESTADO DE TRANSICIÓN / REGULACIÓN PARCIAL.";
+        } else {
+            return "NIVEL III: DESEQUILIBRIO PERSISTENTE.";
+        }
+    }
+
+    function submitData() {
+        const btnSubmit = document.getElementById('btn-submit');
+        const statusMessage = document.getElementById('status-message');
+        
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Enviando...";
+        statusMessage.innerText = "";
+
+        const templateParams = {
+            patient_name: patientName,
+            patient_age: patientAge,
+            score: score,
+            interpretation: getInterpretationText(),
+            to_email: "yanick608@gmail.com"
+        };
+
+        if (typeof emailjs === 'undefined') {
+             btnSubmit.disabled = false;
+             btnSubmit.innerText = "Reintentar Envío";
+             statusMessage.style.color = "var(--konecta-dorado-oscuro)";
+             statusMessage.innerText = "La biblioteca de correos no cargó. Revisa tu conexión.";
+             return;
+        }
+
+        emailjs.send('service_avzt25n', 'template_43iqh7l', templateParams)
+            .then(function(response) {
+                btnSubmit.style.display = 'none';
+                statusMessage.style.color = "var(--konecta-verde)";
+                statusMessage.innerText = "Datos enviados correctamente. Puede cerrar esta ventana.";
+            }, function(error) {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "Reintentar Envío";
+                statusMessage.style.color = "var(--konecta-dorado-oscuro)";
+                statusMessage.innerText = "Error en la conexión. Por favor, intente de nuevo.";
+            });
+    }
+</script>
+
+</body>
+</html>
